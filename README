@@ -14,3 +14,6 @@ Installation & Usage
 Prints the feed XML to stdout, either use a cron job and redirect to
 a timeline.rss file or use the script directly in your feed reader of
 choice (Liferea!).
+
+You only need to do the OAuth dance once, twirss' stores the credentials
+in ~/.twirss afterwards.
