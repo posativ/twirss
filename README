@@ -1,0 +1,16 @@
+twirss: Twitter Timeline als RSS Feed
+=====================================
+
+Rekonstruktion eines verschollenen Skripts.
+http://blog.posativ.org/2010/100-zeilen-python-twitter-timeline-als-rss-feed/
+
+Installation & Usage
+--------------------
+
+    $ pip install https://github.com/posativ/twirss/archive/master.zip
+    $ twirss
+    ... OAuth dance ... returns XML afterwards
+
+Prints the feed XML to stdout, either use a cron job and redirect to
+a timeline.rss file or use the script directly in your feed reader of
+choice (Liferea!).
