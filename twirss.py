@@ -105,7 +105,6 @@ if __name__ == '__main__':
     _home = api.me().screen_name
     locale.setlocale(locale.LC_TIME, 'C') # tweepy fix
 
-    print 'Content-Type: application/atom+xml\n'
     print '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">'
     print '<channel>'
     print '     <title>Timeline: %s</title>' % _home
