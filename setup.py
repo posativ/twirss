@@ -9,5 +9,5 @@ setup(
     author_email='info@posativ.org',
     license='WTFPL',
     install_requires='tweepy',
-    scripts=['twirss.py']
+    scripts=['twirss']
 )
