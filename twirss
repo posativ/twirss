@@ -60,7 +60,7 @@ def process(text):
 
     def hash(text):
         """converts #hash to <a href="http://twitter.com/search?q=#hash">#hash</a>"""
-        return re.sub(r'(#[\w\d]+)', r'<a href="http://twitter.com/search?q=\1">\1</a>', text)
+        return re.sub(r'#([\w\d]+)', r'<a href="http://twitter.com/search?q=%23\1">#\1</a>', text)
 
     text = url(text)
     text = at(text)
