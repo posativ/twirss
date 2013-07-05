@@ -14,7 +14,7 @@ import locale
 from string import Template
 
 from cgi import escape
-from urllib import FancyURLopener
+from urllib2 import Request, urlopen, HTTPError, URLError
 
 from os.path import expanduser
 from optparse import OptionParser
@@ -36,24 +36,22 @@ entry = Template('''<item>
 </item>''')
 
 
+class HeadRequest(Request):
+    def get_method(self):
+        return "HEAD"
+
+
 def process(text):
     """process(text) takes a twitter message and unpack the url, link
     @user and links #hash"""
 
-    def direct(url):
-        """bypasses horrible url shorteners"""
-        socket.setdefaulttimeout(2.5)
-        FancyURLopener.version = 'Mozilla/5.0 (Windows; U; Windows NT 6.1; de; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8'
-        try:
-            return FancyURLopener().open(url).geturl()
-        except Exception: # FIXME: what exception could be raised? (IOError: setdefaulttimeout, )
-            return url
-
     def url(text):
-        for item in re.findall('https?://[\w\d/?=#-.~]+', text):
-            """TODO: we need a really good url matching regex"""
-            real = direct(item)
-            text = text.replace(item, '<a href="%s">%s</a>' % (real, real))
+        for url in re.findall('https?://[^ ]+', text):
+            try:
+                real = urlopen(HeadRequest(url)).geturl()
+            except (HTTPError, URLError):
+                real = url
+            text = text.replace(url, '<a href="%s">%s</a>' % (real, real))
         return text
 
     def at(text):
