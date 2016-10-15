@@ -69,6 +69,32 @@ def process(text):
     return text
 
 
+def parse_source(src, opts={}):
+    """parse_source(src, opts) processes the input string and returns a function
+    which fetches the specified resource. The returned function takes a single
+    argument, a tweepy.API object instance. opts is a dict of optional
+    parameters to be sent in the request. Valid resources are user timelines and
+    list timelines. Example source strings:
+
+                                 # timeline of the currently authorized user
+        lists/list               # "list" list managed by the currenly authorized user
+        sample_user              # profile of sample_user
+        sample_user/lists/list1  # "list1" list managed by sample_user"""
+
+    s = [x for x in src.split('/') if x]
+
+    if len(s) == 3 and s[1] == 'lists':
+        return lambda api: api.list_timeline(owner_screen_name=s[0], slug=s[2], **opts)
+    if len(s) == 2 and s[0] == 'lists':
+        return lambda api: api.list_timeline(owner_id=api.me().id, slug=s[1], **opts)
+    elif len(s) == 1:
+        return lambda api: api.user_timeline(id=s[0], **opts)
+    elif len(s) == 0:
+        return lambda api: api.home_timeline(**opts)
+    else:
+        raise Exception('invalid source string: %s' % src)
+
+
 if __name__ == '__main__':
 
     usage = '%prog [options]'
@@ -76,6 +102,13 @@ if __name__ == '__main__':
 
     parser = OptionParser(option_list=options, usage=usage)
     options, args = parser.parse_args()
+
+    if args:
+        src = args[0]
+    else:
+        src = ''
+
+    fetch_tweets = parse_source(src, {'count': 50})
 
     path = expanduser('~/.twirss')
 
@@ -99,14 +132,17 @@ if __name__ == '__main__':
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
     api = tweepy.API(auth)
 
-    Timeline = api.home_timeline(count=50)
-    _home = api.me().screen_name
+    Timeline = fetch_tweets(api)
+
+    if not src:
+        src = api.me().screen_name
+
     locale.setlocale(locale.LC_TIME, 'C') # tweepy fix
 
     print '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">'
     print '<channel>'
-    print '     <title>Timeline: %s</title>' % _home
-    print '     <link>http://twitter.com/%s</link>' % _home
+    print '     <title>Timeline: %s</title>' % src
+    print '     <link>http://twitter.com/%s</link>' % src
     print '     <description>twirss - a simple tweet-to-atom feed aggregator</description>'
     print '     <language>de-DE</language>' # FIXME: there is something like locale.getlocale...
     print '<pubDate>%s</pubDate>' % Timeline[0].created_at.strftime('%a, %d %b %Y %H:%M:%S GMT') # last update
