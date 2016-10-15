@@ -83,7 +83,7 @@ if __name__ == '__main__':
         with io.open(path, 'r') as fp:
             ACCESS_KEY, ACCESS_SECRET = fp.readline().split(':', 1)
     except IOError:
-        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET, "oob")
         auth_url = auth.get_authorization_url()
 
         print 'Please authorize: ' + auth_url
