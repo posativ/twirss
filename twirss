@@ -82,8 +82,8 @@ if __name__ == '__main__':
     try:
         with io.open(path, 'r') as fp:
             ACCESS_KEY, ACCESS_SECRET = fp.readline().split(':', 1)
-    except IOError:
-        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    except ValueError, IOError:
+        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET, 'oob')
         auth_url = auth.get_authorization_url()
 
         print 'Please authorize: ' + auth_url
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         auth.get_access_token(verifier)
 
         with io.open(path, 'w') as fp:
-            fp.write(u':'.join([auth.access_token.key, auth.access_token.secret]))
+            fp.write(u':'.join([auth.access_token, auth.access_token_secret]))
 
         os.execv(sys.executable, [sys.executable] + sys.argv[:])
 
